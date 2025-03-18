@@ -11,9 +11,12 @@ import { useTheme } from "@emotion/react";
 import { useSelector } from "react-redux";
 import { useIsAdmin } from "../../../Hooks/useIsAdmin";
 import useMonitorsFetch from "./Hooks/useMonitorsFetch";
+import useFetchMonitorsWithChecks from "../../../Hooks/useFetchMonitorsWithChecks";
+import useFetchMonitorsWithSummary from "../../../Hooks/useFetchMonitorsWithSummary";
 import GenericFallback from "../../../Components/GenericFallback";
 
 // Constants
+const TYPES = ["pagespeed"];
 const BREADCRUMBS = [{ name: `pagespeed`, path: "/pagespeed" }];
 
 const PageSpeed = () => {
@@ -21,9 +24,27 @@ const PageSpeed = () => {
 	const isAdmin = useIsAdmin();
 	const { user } = useSelector((state) => state.auth);
 
-	const { isLoading, monitors, summary, networkError } = useMonitorsFetch({
+	// const { isLoading, monitors, summary, networkError } = useMonitorsFetch({
+	// 	teamId: user.teamId,
+	// });
+
+	const [monitors, count, isLoading, networkError] = useFetchMonitorsWithChecks({
 		teamId: user.teamId,
+		limit: 10,
+		types: TYPES,
+		page: null,
+		rowsPerPage: null,
+		filter: null,
+		field: null,
+		order: null,
 	});
+
+	const [_, summary, summaryIsLoading, summaryNetworkError] = useFetchMonitorsWithSummary(
+		{
+			teamId: user.teamId,
+			types: TYPES,
+		}
+	);
 
 	if (networkError === true) {
 		return (
@@ -65,7 +86,7 @@ const PageSpeed = () => {
 			/>
 			<MonitorCountHeader
 				shouldRender={!isLoading}
-				monitorCount={summary?.totalMonitors}
+				monitorCount={0}
 				heading="PageSpeed monitors"
 				sx={{ mb: theme.spacing(8) }}
 			/>
