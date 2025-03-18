@@ -9,15 +9,20 @@ import GenericFallback from "../../../Components/GenericFallback";
 import Fallback from "../../../Components/Fallback";
 // Utils
 import { useTheme } from "@emotion/react";
-import { useMonitorFetch } from "./Hooks/useMonitorFetch";
+import useFetchMonitorsWithChecks from "../../../Hooks/useFetchMonitorsWithChecks";
+import useFetchMonitorsWithSummary from "../../../Hooks/useFetchMonitorsWithSummary";
 import { useState } from "react";
 import { useIsAdmin } from "../../../Hooks/useIsAdmin";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
 // Constants
 const BREADCRUMBS = [{ name: `infrastructure`, path: "/infrastructure" }];
-
+const TYPES = ["hardware"];
 const InfrastructureMonitors = () => {
 	// Redux state
+	const { user } = useSelector((state) => state.auth);
+
+	// Local state
 	const [page, setPage] = useState(0);
 	const [rowsPerPage, setRowsPerPage] = useState(5);
 	const [updateTrigger, setUpdateTrigger] = useState(false);
@@ -40,11 +45,22 @@ const InfrastructureMonitors = () => {
 		setRowsPerPage(event.target.value);
 	};
 
-	const { monitors, summary, isLoading, networkError } = useMonitorFetch({
-		page,
-		rowsPerPage,
-		updateTrigger,
+	const [monitors, count, isLoading, networkError] = useFetchMonitorsWithChecks({
+		teamId: user.teamId,
+		limit: 1,
+		types: TYPES,
+		page: page,
+		rowsPerPage: rowsPerPage,
 	});
+
+	const [_, summary, summaryIsLoading, summaryNetworkError] = useFetchMonitorsWithSummary(
+		{
+			teamId: user.teamId,
+			types: TYPES,
+		}
+	);
+
+	console.log(monitors);
 
 	if (networkError === true) {
 		return (

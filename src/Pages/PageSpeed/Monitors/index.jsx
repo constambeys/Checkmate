@@ -10,7 +10,6 @@ import Fallback from "../../../Components/Fallback";
 import { useTheme } from "@emotion/react";
 import { useSelector } from "react-redux";
 import { useIsAdmin } from "../../../Hooks/useIsAdmin";
-import useMonitorsFetch from "./Hooks/useMonitorsFetch";
 import useFetchMonitorsWithChecks from "../../../Hooks/useFetchMonitorsWithChecks";
 import useFetchMonitorsWithSummary from "../../../Hooks/useFetchMonitorsWithSummary";
 import GenericFallback from "../../../Components/GenericFallback";
@@ -23,10 +22,6 @@ const PageSpeed = () => {
 	const theme = useTheme();
 	const isAdmin = useIsAdmin();
 	const { user } = useSelector((state) => state.auth);
-
-	// const { isLoading, monitors, summary, networkError } = useMonitorsFetch({
-	// 	teamId: user.teamId,
-	// });
 
 	const [monitors, count, isLoading, networkError] = useFetchMonitorsWithChecks({
 		teamId: user.teamId,
